@@ -41,6 +41,7 @@ parser.add_argument("-l", "--lines", type = int, default = 100, help = "The numb
 parser.add_argument("-o", "--offset", type = int, default = 0, help = "The number of lines to skip at the start of the file.")
 parser.add_argument("-hr", "--header", type = int, default = 0, help = "The number of header rows to keep.")
 parser.add_argument("-r", "--reverse", action = "store_true", help = "Read lines from the end of the file.")
+parser.add_argument("-v", "--verbose", action = "store_true", help = "Include parameters in output file extension.")
 args = parser.parse_args()
 
 if not os.path.exists(args.file):
@@ -60,12 +61,13 @@ if args.offset < 0:
 	quit()
 
 extension = ["exerpt"]
-if args.lines > 0:
-	extension.append("l=" + str(args.lines))
-if args.offset > 0:
-	extension.append("o=" + str(args.offset))
-if args.reverse:
-	extension.append("r")
+if args.verbose:
+	if args.lines > 0:
+		extension.append("l=" + str(args.lines))
+	if args.offset > 0:
+		extension.append("o=" + str(args.offset))
+	if args.reverse:
+		extension.append("r")
 
 outFile = addExtStart(args.file, "-".join(extension))
 
