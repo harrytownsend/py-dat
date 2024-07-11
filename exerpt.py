@@ -9,9 +9,11 @@ args = parser.parse_args()
 
 if not os.path.exists(args.file):
 	print("The specified file does not exist.")
+	quit()
 
 if os.path.isdir(args.file):
 	print("The specified path points to a folder.")
+	quit()
 
 outFile = addExtStart(args.file, "exerpt-" + str(args.lines))
 
