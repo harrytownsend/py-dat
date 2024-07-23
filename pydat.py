@@ -41,3 +41,73 @@ class Buffer:
 			self._list[self._head] = item
 
 		self._head = (self._head + 1) % self._size
+
+class CSVLine:
+
+	def __init__(self, line, delimiter = ",", quote = None):
+		self._line = line
+		self._delimiter = delimiter
+		self._quote = quote
+		self._fields = []
+
+		if self._line.endswith("\r\n"):
+			self._line = self._line[0 : len(self._line) - 2]
+		elif self._line.endswith("\n"):
+			self._line = self._line[0 : len(self._line) - 1]
+
+		self._readLine()
+
+	def get(self, position):
+		return self._fields[position]
+	
+	def length(self):
+		return len(self._fields)
+
+	def _readLine(self):
+		position = 0
+		length = len(self._line)
+
+		read = True
+		while read:
+			position = self._skipWhitespace(position)
+
+			if position < length:
+				end = self._readField(position)
+				field = self._line[position:end]
+
+				if self._quote is not None and field.startswith(self._quote) and field.endswith(self._quote):
+					field = field[1 : len(field) - 1]
+
+				self._fields.append(field)
+
+				position = end + 1
+			else:
+				read = False
+
+	def _readField(self, offset):
+		length = len(self._line)
+
+		isQuoted = False
+		if self._quote is not None and self._quote == self._line[offset]:
+			isQuoted = True
+			offset += 1
+
+		while offset < length:
+			char = self._line[offset]
+
+			if char == "\\":
+				offset += 1
+			elif (isQuoted and char == self._quote) or (not isQuoted and char == ","):
+				return offset
+
+			offset += 1
+
+		return offset
+		
+	def _skipWhitespace(self, offset):
+		length = len(self._line)
+
+		while offset < length and self._line[offset].isspace():
+			offset += 1
+
+		return offset
